@@ -12,6 +12,8 @@ public class AIController implements PlayerController {
     private boolean passPressed;
     private boolean shootPressed;
     private boolean tacklePressed;
+    private boolean slidePressed;
+    private boolean specialPressed;
 
     @Override
     public float getMoveX() { return moveX; }
@@ -29,6 +31,12 @@ public class AIController implements PlayerController {
     public boolean isTacklePressed() { return tacklePressed; }
 
     @Override
+    public boolean isSlidePressed() { return slidePressed; }
+
+    @Override
+    public boolean isSpecialPressed() { return specialPressed; }
+
+    @Override
     public void update(float deltaTime, Entity player, Entity ball) {
         resetInputs();
 
@@ -42,6 +50,11 @@ public class AIController implements PlayerController {
 
         if (playerComponent == null || playerPos == null || ballComponent == null || ballPos == null) return;
 
+        if (playerComponent.hp <= 0) {
+            playerComponent.currentState = PlayerState.UNCONSCIOUS;
+            return;
+        }
+
         boolean hasBall = (ballComponent.owner == player);
         boolean myTeamHasBall = ballComponent.owner != null &&
             ballComponent.owner.getComponent(PlayerComponent.class) != null &&
@@ -53,10 +66,20 @@ public class AIController implements PlayerController {
             // In a real match we would check pitch direction, assuming team 0 moves right
             if (playerComponent.teamId == 0) {
                 moveX = 1.0f; // Move right
-                if (playerPos.x > 80) shootPressed = true;
+                if (playerPos.x > 90) {
+                    specialPressed = true;
+                    shootPressed = false;
+                } else if (playerPos.x > 80) {
+                    shootPressed = true;
+                }
             } else {
                 moveX = -1.0f; // Move left
-                if (playerPos.x < -80) shootPressed = true;
+                if (playerPos.x < -90) {
+                    specialPressed = true;
+                    shootPressed = false;
+                } else if (playerPos.x < -80) {
+                    shootPressed = true;
+                }
             }
             playerComponent.currentState = PlayerState.DRIBBLING;
 
@@ -67,17 +90,26 @@ public class AIController implements PlayerController {
 
             float length = (float) Math.sqrt(dx * dx + dy * dy);
 
-            if (length > 0) {
-                moveX = dx / length;
-                moveY = dy / length;
-            }
+            if (ballComponent.owner == null && ballComponent.z > 2.0f && length < 3.0f) {
+                specialPressed = true;
+                tacklePressed = false;
+                playerComponent.currentState = PlayerState.BACKFLIP_KICK;
+            } else {
+                if (length > 0) {
+                    moveX = dx / length;
+                    moveY = dy / length;
+                }
 
-            playerComponent.currentState = PlayerState.CHASING_BALL;
+                playerComponent.currentState = PlayerState.CHASING_BALL;
 
-            // Tackle if close
-            if (length < 2.0f && ballComponent.owner != null) {
-                tacklePressed = true;
-                playerComponent.currentState = PlayerState.TACKLING;
+                // Tackle if close
+                if (length < 2.0f && ballComponent.owner != null) {
+                    tacklePressed = true;
+                    playerComponent.currentState = PlayerState.TACKLING;
+                } else if (length >= 2.0f && length < 5.0f && ballComponent.owner != null) {
+                    slidePressed = true;
+                    playerComponent.currentState = PlayerState.SLIDING;
+                }
             }
         } else {
             // My team has ball but not me, position oneself or move forward
@@ -93,5 +125,7 @@ public class AIController implements PlayerController {
         passPressed = false;
         shootPressed = false;
         tacklePressed = false;
+        slidePressed = false;
+        specialPressed = false;
     }
 }

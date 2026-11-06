@@ -7,5 +7,10 @@ public enum PlayerState {
     TACKLING,
     PASSING,
     SHOOTING,
-    DOWNED
+    DOWNED,
+    SLIDING,
+    BICYCLE_KICK,
+    DIVING_HEADER,
+    BACKFLIP_KICK,
+    UNCONSCIOUS
 }
