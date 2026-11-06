@@ -7,4 +7,7 @@ public class HiddenAttributes {
     public float consistency;
     public float currentForm;
     public float fatigueDecay;
+    public float matchSharpness;
+    public int daysFatigued;
+    public boolean volatileTrait;
 }

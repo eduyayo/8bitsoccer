@@ -10,4 +10,5 @@ public class MentalAttributes {
     public float bravery;
     public float leadership;
     public float communication;
+    public float morale;
 }

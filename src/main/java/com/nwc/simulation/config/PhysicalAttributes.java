@@ -9,4 +9,5 @@ public class PhysicalAttributes {
     public float workRate;
     public float strength;
     public float jumpingReach;
+    public float fatigue;
 }
