@@ -29,6 +29,22 @@ public class PlayerBehaviorSystem extends IteratingSystem {
 
         PlayerController controller = controllerComponent.controller;
 
+        if (playerComponent.currentState == com.nwc.simulation.fsm.PlayerState.UNCONSCIOUS) {
+            velocityComponent.x = 0;
+            velocityComponent.y = 0;
+            return;
+        }
+
+        if (controller.isSpecialPressed()) {
+            if (playerComponent.currentState != com.nwc.simulation.fsm.PlayerState.BACKFLIP_KICK) {
+                if (velocityComponent.x == 0 && velocityComponent.y == 0) {
+                    playerComponent.currentState = com.nwc.simulation.fsm.PlayerState.BICYCLE_KICK;
+                } else {
+                    playerComponent.currentState = com.nwc.simulation.fsm.PlayerState.DIVING_HEADER;
+                }
+            }
+        }
+
         // Apply controller inputs to physics/state
         float topSpeed = playerComponent.profile != null ? playerComponent.profile.physical.topSpeed : playerComponent.speed;
 

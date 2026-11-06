@@ -14,6 +14,7 @@ public class PlayerComponent implements Component {
     public float speed; // Keep for now as topSpeed/speed alias
     public float tacklePower;
     public float shootPower;
+    public float hp = 100f;
 
     public PlayerComponent(int teamId, int playerNumber, PlayerProfile profile) {
         this.teamId = teamId;

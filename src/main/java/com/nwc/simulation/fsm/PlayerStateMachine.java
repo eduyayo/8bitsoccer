@@ -28,11 +28,18 @@ public class PlayerStateMachine {
                 break;
             case PASSING:
             case SHOOTING:
+            case SLIDING:
+            case BICYCLE_KICK:
+            case DIVING_HEADER:
+            case BACKFLIP_KICK:
                 // Return to IDLE after action completes
                 playerComponent.currentState = PlayerState.IDLE;
                 break;
             case DOWNED:
                 // Recovery logic
+                break;
+            case UNCONSCIOUS:
+                // Do not transition out
                 break;
         }
 
