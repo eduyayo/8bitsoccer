@@ -1,0 +1,17 @@
+/app/src/main/java/com/nwc/simulation/components/VelocityComponent.java
+/app/src/main/java/com/nwc/simulation/MatchSimulation.java
+/app/src/main/java/com/nwc/simulation/fsm/PlayerStateMachine.java
+/app/src/main/java/com/nwc/simulation/components/PositionComponent.java
+/app/src/main/java/com/nwc/simulation/systems/MovementSystem.java
+/app/src/main/java/com/nwc/simulation/systems/MatchSystem.java
+/app/src/main/java/com/nwc/simulation/fsm/MatchState.java
+/app/src/main/java/com/nwc/simulation/systems/PlayerBehaviorSystem.java
+/app/src/main/java/com/nwc/simulation/systems/InteractionSystem.java
+/app/src/main/java/com/nwc/simulation/systems/ControllerSystem.java
+/app/src/main/java/com/nwc/simulation/fsm/MatchStateMachine.java
+/app/src/main/java/com/nwc/simulation/fsm/PlayerState.java
+/app/src/main/java/com/nwc/simulation/components/ControllerComponent.java
+/app/src/main/java/com/nwc/simulation/controllers/AIController.java
+/app/src/main/java/com/nwc/simulation/controllers/PlayerController.java
+/app/src/main/java/com/nwc/simulation/components/PlayerComponent.java
+/app/src/main/java/com/nwc/simulation/components/BallComponent.java
