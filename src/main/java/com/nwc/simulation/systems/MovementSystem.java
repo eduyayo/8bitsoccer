@@ -6,10 +6,15 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.nwc.simulation.components.PositionComponent;
 import com.nwc.simulation.components.VelocityComponent;
 import com.nwc.simulation.components.BallComponent;
+import com.nwc.simulation.config.MatchConfig;
+import com.nwc.simulation.config.FieldType;
 
 public class MovementSystem extends IteratingSystem {
-    public MovementSystem() {
+    private MatchConfig matchConfig;
+
+    public MovementSystem(MatchConfig matchConfig) {
         super(Family.all(PositionComponent.class, VelocityComponent.class).get());
+        this.matchConfig = matchConfig;
     }
 
     @Override
@@ -28,6 +33,24 @@ public class MovementSystem extends IteratingSystem {
             } else {
                 ball.z = 0;
                 ball.zVelocity = 0;
+
+                // Apply friction to the ball when rolling on the ground
+                if (ball.owner == null) {
+                    float friction = 2.0f; // Default grass friction
+                    if (matchConfig.fieldType == FieldType.SAND) {
+                        friction = 5.0f; // High friction
+                    } else if (matchConfig.fieldType == FieldType.ICE) {
+                        friction = 0.5f; // Low friction
+                    }
+
+                    float speed = (float) Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+                    if (speed > 0) {
+                        float drop = speed * friction * deltaTime;
+                        float newSpeed = Math.max(0, speed - drop);
+                        velocity.x *= newSpeed / speed;
+                        velocity.y *= newSpeed / speed;
+                    }
+                }
             }
         }
     }

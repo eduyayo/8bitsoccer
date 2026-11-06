@@ -38,9 +38,10 @@ public class MatchSimulation {
         interactionSystem = new InteractionSystem();
 
         engine.addSystem(controllerSystem);
-        engine.addSystem(new PlayerBehaviorSystem(playerStateMachine));
-        engine.addSystem(new MovementSystem());
+        engine.addSystem(new PlayerBehaviorSystem(playerStateMachine, matchConfig));
+        engine.addSystem(new MovementSystem(matchConfig));
         engine.addSystem(interactionSystem);
+        engine.addSystem(new HazardSystem());
 
         matchSystem = new MatchSystem(matchStateMachine);
         engine.addSystem(matchSystem);
@@ -60,6 +61,26 @@ public class MatchSimulation {
         // Create players based on config
         createTeamEntities(0, matchConfig.team1.players);
         createTeamEntities(1, matchConfig.team2.players);
+
+        // Create hazards based on config
+        if (matchConfig.fieldType == com.nwc.simulation.config.FieldType.DIRT) {
+            createHazards(HazardComponent.Type.ROCK, 5, 2.0f);
+        }
+        if (matchConfig.weatherCondition == com.nwc.simulation.config.WeatherCondition.RAIN) {
+            createHazards(HazardComponent.Type.PUDDLE, 10, 4.0f);
+        }
+    }
+
+    private void createHazards(HazardComponent.Type type, int count, float radius) {
+        for (int i = 0; i < count; i++) {
+            Entity hazard = new Entity();
+            // Randomly scatter around the pitch. Assume pitch bounds roughly -50 to 50 for X, -30 to 30 for Y.
+            float x = (float) (Math.random() * 100 - 50);
+            float y = (float) (Math.random() * 60 - 30);
+            hazard.add(new PositionComponent(x, y));
+            hazard.add(new HazardComponent(type, radius));
+            engine.addEntity(hazard);
+        }
     }
 
     private void createTeamEntities(int teamId, List<PlayerProfile> players) {
