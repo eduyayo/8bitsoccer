@@ -26,8 +26,9 @@ public class PlayerBehaviorSystem extends IteratingSystem {
         PlayerController controller = controllerComponent.controller;
 
         // Apply controller inputs to physics/state
-        velocityComponent.x = controller.getMoveX() * playerComponent.speed;
-        velocityComponent.y = controller.getMoveY() * playerComponent.speed;
+        float topSpeed = playerComponent.profile != null ? playerComponent.profile.physical.topSpeed : playerComponent.speed;
+        velocityComponent.x = controller.getMoveX() * topSpeed;
+        velocityComponent.y = controller.getMoveY() * topSpeed;
 
         // FSM update handles state transitions
         stateMachine.update(entity, deltaTime);
