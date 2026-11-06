@@ -7,14 +7,24 @@ import com.nwc.simulation.controllers.AIController;
 import com.nwc.simulation.fsm.MatchStateMachine;
 import com.nwc.simulation.fsm.PlayerStateMachine;
 import com.nwc.simulation.systems.*;
+import com.nwc.simulation.config.MatchConfig;
+import com.nwc.simulation.config.TeamConfig;
+import com.nwc.simulation.config.PlayerProfile;
+import java.util.List;
 
 public class MatchSimulation {
     private Engine engine;
     private MatchSystem matchSystem;
     private ControllerSystem controllerSystem;
     private InteractionSystem interactionSystem;
+    private MatchConfig matchConfig;
 
     public MatchSimulation() {
+        this(MatchConfig.createDefault());
+    }
+
+    public MatchSimulation(MatchConfig matchConfig) {
+        this.matchConfig = matchConfig;
         engine = new Engine();
         initializeSystems();
         initializeEntities();
@@ -47,20 +57,24 @@ public class MatchSimulation {
         controllerSystem.setBall(ball);
         interactionSystem.setBall(ball);
 
-        // Create players (e.g., 6 per team for NWC)
-        for (int team = 0; team < 2; team++) {
-            for (int i = 0; i < 6; i++) {
-                Entity player = new Entity();
-                float startX = (team == 0) ? -20 - i * 10 : 20 + i * 10;
-                float startY = -30 + i * 10;
+        // Create players based on config
+        createTeamEntities(0, matchConfig.team1.players);
+        createTeamEntities(1, matchConfig.team2.players);
+    }
 
-                player.add(new PositionComponent(startX, startY));
-                player.add(new VelocityComponent(0, 0));
-                player.add(new PlayerComponent(team, i));
-                player.add(new ControllerComponent(new AIController()));
+    private void createTeamEntities(int teamId, List<PlayerProfile> players) {
+        for (int i = 0; i < players.size(); i++) {
+            PlayerProfile profile = players.get(i);
+            Entity player = new Entity();
+            float startX = (teamId == 0) ? -20 - i * 10 : 20 + i * 10;
+            float startY = -30 + i * 10;
 
-                engine.addEntity(player);
-            }
+            player.add(new PositionComponent(startX, startY));
+            player.add(new VelocityComponent(0, 0));
+            player.add(new PlayerComponent(teamId, i, profile));
+            player.add(new ControllerComponent(new AIController()));
+
+            engine.addEntity(player);
         }
     }
 
