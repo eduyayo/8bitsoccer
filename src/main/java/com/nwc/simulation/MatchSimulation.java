@@ -12,12 +12,15 @@ import com.nwc.simulation.config.TeamConfig;
 import com.nwc.simulation.config.PlayerProfile;
 import java.util.List;
 
+import java.util.Random;
+
 public class MatchSimulation {
     private Engine engine;
     private MatchSystem matchSystem;
     private ControllerSystem controllerSystem;
     private InteractionSystem interactionSystem;
     private MatchConfig matchConfig;
+    private Random random;
 
     public MatchSimulation() {
         this(MatchConfig.createDefault());
@@ -25,6 +28,7 @@ public class MatchSimulation {
 
     public MatchSimulation(MatchConfig matchConfig) {
         this.matchConfig = matchConfig;
+        this.random = new Random(matchConfig.seed);
         engine = new Engine();
         initializeSystems();
         initializeEntities();
@@ -75,8 +79,8 @@ public class MatchSimulation {
         for (int i = 0; i < count; i++) {
             Entity hazard = new Entity();
             // Randomly scatter around the pitch. Assume pitch bounds roughly -50 to 50 for X, -30 to 30 for Y.
-            float x = (float) (Math.random() * 100 - 50);
-            float y = (float) (Math.random() * 60 - 30);
+            float x = (float) (random.nextDouble() * 100 - 50);
+            float y = (float) (random.nextDouble() * 60 - 30);
             hazard.add(new PositionComponent(x, y));
             hazard.add(new HazardComponent(type, radius));
             engine.addEntity(hazard);
