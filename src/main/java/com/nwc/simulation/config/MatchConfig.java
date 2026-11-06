@@ -3,6 +3,8 @@ package com.nwc.simulation.config;
 public class MatchConfig {
     public TeamConfig team1;
     public TeamConfig team2;
+    public FieldType fieldType = FieldType.GRASS;
+    public WeatherCondition weatherCondition = WeatherCondition.CLEAR;
 
     public static MatchConfig createDefault() {
         MatchConfig config = new MatchConfig();
