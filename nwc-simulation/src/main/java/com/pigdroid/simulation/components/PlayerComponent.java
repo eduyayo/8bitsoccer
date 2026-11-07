@@ -16,6 +16,9 @@ public class PlayerComponent implements Component {
     public float shootPower;
     public float hp = 100f;
 
+    public int yellowCards;
+    public boolean redCard;
+
     public PlayerComponent(int teamId, int playerNumber, PlayerProfile profile) {
         this.teamId = teamId;
         this.playerNumber = playerNumber;

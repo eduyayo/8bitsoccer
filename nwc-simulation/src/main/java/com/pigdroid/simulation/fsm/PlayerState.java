@@ -12,5 +12,6 @@ public enum PlayerState {
     BICYCLE_KICK,
     DIVING_HEADER,
     BACKFLIP_KICK,
-    UNCONSCIOUS
+    UNCONSCIOUS,
+    EJECTED
 }

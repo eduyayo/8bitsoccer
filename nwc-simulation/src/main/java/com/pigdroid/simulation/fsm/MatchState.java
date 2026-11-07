@@ -5,5 +5,11 @@ public enum MatchState {
     PLAYING,
     GOAL_SCORED,
     HALF_TIME,
-    GAME_OVER
+    GAME_OVER,
+    FOUL,
+    FREE_KICK,
+    PENALTY,
+    CORNER_KICK,
+    THROW_IN,
+    GOAL_KICK
 }
