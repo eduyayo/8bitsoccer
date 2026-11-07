@@ -1,8 +1,13 @@
 package com.pigdroid.simulation.systems;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
+import com.pigdroid.simulation.components.BallComponent;
+import com.pigdroid.simulation.components.PositionComponent;
 import com.pigdroid.simulation.fsm.MatchStateMachine;
+import com.pigdroid.simulation.fsm.MatchState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +24,29 @@ public class MatchSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         stateMachine.update(deltaTime);
-        // Match specific rules, boundary checks for goals, etc would go here
+
+        if (stateMachine.getCurrentState() == MatchState.PLAYING) {
+            Engine engine = getEngine();
+            if (engine != null) {
+                for (Entity ball : engine.getEntitiesFor(Family.all(BallComponent.class, PositionComponent.class).get())) {
+                    PositionComponent pos = ball.getComponent(PositionComponent.class);
+
+                    if (pos.y > 30 || pos.y < -30) {
+                        stateMachine.changeState(MatchState.THROW_IN);
+                        // Resume play automatically to prevent softlock in this MVP
+                        stateMachine.changeState(MatchState.PLAYING);
+                    } else if (pos.x > 50 || pos.x < -50) {
+                        if (pos.y > -5 && pos.y < 5) {
+                            // Goal scored handled elsewhere or can be handled here.
+                        } else {
+                            stateMachine.changeState(MatchState.CORNER_KICK);
+                            // Resume play automatically to prevent softlock in this MVP
+                            stateMachine.changeState(MatchState.PLAYING);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void teamScored(int teamId) {

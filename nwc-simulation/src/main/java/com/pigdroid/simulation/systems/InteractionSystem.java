@@ -42,6 +42,7 @@ public class InteractionSystem extends IteratingSystem {
             // If close enough and ball is on the ground (or low enough)
             if (distanceSq < 4.0f && ballComponent.z < 2.0f) {
                 ballComponent.owner = player;
+                ballComponent.lastTouchedBy = player;
                 player.getComponent(PlayerComponent.class).currentState = PlayerState.DRIBBLING;
             }
         }
@@ -56,6 +57,7 @@ public class InteractionSystem extends IteratingSystem {
                 player.getComponent(PlayerComponent.class).currentState = PlayerState.BACKFLIP_KICK;
                 VelocityComponent ballVelocityComponent = ball.getComponent(VelocityComponent.class);
                 if (ballVelocityComponent != null) {
+                    ballComponent.lastTouchedBy = player;
                     float mx = controller.getMoveX();
                     float my = controller.getMoveY();
                     float len = (float) Math.sqrt(mx * mx + my * my);
@@ -76,6 +78,7 @@ public class InteractionSystem extends IteratingSystem {
             if (ballVelocityComponent != null) {
                 if (controller.isPassPressed()) {
                     ballComponent.owner = null;
+                    ballComponent.lastTouchedBy = player;
                     float minDistanceSq = Float.MAX_VALUE;
                     Entity nearestTeammate = null;
                     PositionComponent nearestPos = null;
@@ -110,6 +113,7 @@ public class InteractionSystem extends IteratingSystem {
                     }
                 } else if (controller.isShootPressed()) {
                     ballComponent.owner = null;
+                    ballComponent.lastTouchedBy = player;
                     float mx = controller.getMoveX();
                     float my = controller.getMoveY();
                     float len = (float) Math.sqrt(mx * mx + my * my);
@@ -122,6 +126,7 @@ public class InteractionSystem extends IteratingSystem {
                     }
                 } else if (controller.isSpecialPressed()) {
                     ballComponent.owner = null;
+                    ballComponent.lastTouchedBy = player;
                     float mx = controller.getMoveX();
                     float my = controller.getMoveY();
                     float len = (float) Math.sqrt(mx * mx + my * my);
@@ -151,10 +156,30 @@ public class InteractionSystem extends IteratingSystem {
                         if (otherComp.hp <= 0) {
                             otherComp.currentState = PlayerState.UNCONSCIOUS;
                         }
+
+                        // Foul logic
+                        if (Math.random() < 0.2) { // 20% chance of foul on successful tackle
+                            // In a full implementation, we should also trigger MatchState.FOUL, FREE_KICK, or PENALTY
+                            // To prevent softlocking, we just log the card/ejection for now and keep play moving,
+                            // or properly implement the state machine transition in a complete rule set.
+                            if (Math.random() < 0.2) { // 20% of fouls are red cards
+                                pComp.redCard = true;
+                                pComp.currentState = PlayerState.EJECTED;
+                            } else {
+                                pComp.yellowCards++;
+                                if (pComp.yellowCards >= 2) {
+                                    pComp.redCard = true;
+                                    pComp.currentState = PlayerState.EJECTED;
+                                }
+                            }
+                        }
+
                         if (ballComponent.owner == other) {
                             ballComponent.owner = null;
                         }
-                        pComp.currentState = PlayerState.IDLE;
+                        if (pComp.currentState != PlayerState.EJECTED) {
+                            pComp.currentState = PlayerState.IDLE;
+                        }
                         break;
                     }
                 }
